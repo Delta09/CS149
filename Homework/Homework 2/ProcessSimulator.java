@@ -1,4 +1,9 @@
-
+/**
+ * Models a ProcessSimulator class to give a process attributes
+ * and to update the list with helper methods.
+ * @author yen_my_huynh
+ *
+ */
 public class ProcessSimulator {
 	private float arrivalTime;
 	private float expectedRunTime;
@@ -13,7 +18,8 @@ public class ProcessSimulator {
 	private float finishedTime;
 
 	/**
-	 * 
+	 * Constructs a ProcessSimulator with id, an arrival time, expected run time, priority
+	 * and status.
 	 * @param id the id
 	 * @param arrivalTime the arrival time
 	 * @param expectedRunTime the expected run time
