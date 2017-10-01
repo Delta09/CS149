@@ -26,8 +26,7 @@ public class ProcessSimulator {
 	 * @param priority the priority
 	 * @param processCompleted marks status 
 	 */
-	public ProcessSimulator(String id, float arrivalTime, float expectedRunTime, int priority,
-			boolean processCompleted) {
+	public ProcessSimulator(String id, float arrivalTime, float expectedRunTime, int priority, boolean processCompleted) {
 		this.arrivalTime = arrivalTime;
 		this.expectedRunTime = expectedRunTime;
 		this.priority = priority;
@@ -186,6 +185,6 @@ public class ProcessSimulator {
 	 */
 	 public String toString(){
 	 return "Process id: " + id + "\t\tArrival Time: " + arrivalTime +
-	 "\tExpected Run Time: " + expectedRunTime + "\t\tPriority: " + priority;
+	 "\tExpected Run Time: " + expectedRunTime + "\t\tPriority: " + priority + "\n";
 	 }	
 }

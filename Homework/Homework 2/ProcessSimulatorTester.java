@@ -14,25 +14,28 @@ public class ProcessSimulatorTester {
 	
 	// main method
 	public static void main(String args[]){
-		PriorityQueue<ProcessSimulator> processQueue = new PriorityQueue<ProcessSimulator>(100, new ArrivalTimeComparator());
+		PriorityQueue<ProcessSimulator> processQueue = new PriorityQueue<ProcessSimulator>(50, new ArrivalTimeComparator());
 		Random rand = new Random();
 		boolean processCompleted = false;
 		
-		// another generator for priority queues
-		for (int i = 0; i < 50; i++){
-			ProcessSimulator p = new ProcessSimulator(Integer.toString(i), randBetween(0,MAX_QUANTA), randBetween(0.1,10), 
-					rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
-			processQueue.add(p);
-		}
-		System.out.println("*****************************************First Come First Serve*****************************************");
-	
 		for (int i = 1; i < 6; i++) {
 			System.out.println("Run: " + i);
+			
+			// Generator for priority queues
+			System.out.println("Generating Queue");
+			for (int k = 0; k < 50; k++){
+				ProcessSimulator p = new ProcessSimulator(Integer.toString(k), randBetween(0,MAX_QUANTA), randBetween(0.1,10), rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
+				processQueue.add(p);
+			}
+			
+			System.out.println("*****************************************First Come First Serve*****************************************");
 			FirstComeFirstServed test = new FirstComeFirstServed(processQueue);
 			test.runFCFS();
 			for (int j = 0; j < test.getOutputListing().size(); j++) {
 				System.out.println(test.getOutputListing().get(j));
 			}
+			
+			processQueue.clear();
 		}
 	}
 	

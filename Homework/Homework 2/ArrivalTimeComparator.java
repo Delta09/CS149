@@ -13,9 +13,10 @@ public class ArrivalTimeComparator implements Comparator<ProcessSimulator>{
 	 * @param p2 the second process
 	 */
 	public int compare(ProcessSimulator p1, ProcessSimulator p2){
+		
 		float arrivalTimeDifference = p1.getArrivalTime() - p2.getArrivalTime();
 		int idOrder = p1.getId().compareTo(p2.getId());
-		if (arrivalTimeDifference != 0 ){
+		if (arrivalTimeDifference > 0 ){
 			return 1;
 		}
 		else if (arrivalTimeDifference < 0){

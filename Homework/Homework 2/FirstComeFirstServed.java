@@ -35,6 +35,7 @@ public class FirstComeFirstServed {
 		while (!processFinished && quanta < 100){
 			currentProcess = processQueue.poll();
 			
+			
 			// runs and waits until the process arrives and increases quanta during the wait.
 			while (currentProcess.getArrivalTime() > quanta){
 				quanta++;
@@ -111,6 +112,7 @@ public class FirstComeFirstServed {
 		float averageTurnAroundTime = turnAroundTimeTotal/ processQueue.size();
 		float averageWaitingTime = waitingTimeTotal/ processQueue.size();
 		float averageResponseTime = responseTimeTotal/ processQueue.size();
+		
 		// casts throughtput to avoid truncating
 		float throughput = (float) processQueueTrack.size()/ 100;
 		String timeChartDisplay = "\n" + "Time Chart:" + timeChart;
