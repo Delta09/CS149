@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 /**
- * Models a FirstComeFirstServed class to 
+ * Models a FirstComeFirstServed class to serve processes in first-come first serve basis.
  * @author yen_my_huynh
  *
  */
@@ -93,19 +93,11 @@ public class FirstComeFirstServed {
 		float waitingTimeTotal = 0;
 		float responseTimeTotal = 0;
 		String timeChart = "";
-		int count = 0;
 		
 		for (ProcessSimulator p : processQueueTrack){
 			turnAroundTimeTotal += p.getTurnAroundTime();
 			waitingTimeTotal += p.getWaitingTime();
 			responseTimeTotal += p.getResponseTime();
-			count++;
-			
-			if (count == 10){
-				timeChart += "\n";
-				count = 0;
-			}
-		
 			outputListing.add(p.toString());
 		}
 		// gathers up all the statistics
