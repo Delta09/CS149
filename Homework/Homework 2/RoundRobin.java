@@ -98,26 +98,17 @@ public class RoundRobin {
 		float waitingTimeTotal = 0;
 		float responseTimeTotal = 0;
 		String timeChart = "";
-		int count = 0;
 		
 		for (ProcessSimulator p : processQueueTrack){
 			turnAroundTimeTotal += p.getTurnAroundTime();
 			waitingTimeTotal += p.getWaitingTime();
 			responseTimeTotal += p.getResponseTime();
-			count++;
-			
-			if (count == 10){
-				timeChart += "\n";
-				count = 0;
-			}
-		
 			outputListing.add(p.toString());
 		}
 		// gathers up all the statistics
-		float averageTurnAroundTime = turnAroundTimeTotal/ processQueueTrack.size();
-		float averageWaitingTime = waitingTimeTotal/ processQueueTrack.size();
-		float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
-		
+		float averageTurnAroundTime = turnAroundTimeTotal/ processQueue.size();
+		float averageWaitingTime = waitingTimeTotal/ processQueue.size();
+		float averageResponseTime = responseTimeTotal/ processQueue.size();
 		// casts throughtput to avoid truncating
 		float throughput = (float) processQueueTrack.size()/ 100;
 		String timeChartDisplay = "\n" + "Time Chart:" + timeChart;
