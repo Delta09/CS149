@@ -15,6 +15,7 @@ public class ProcessSimulatorTester{
 	// main method
 	public static void main(String args[]){
 		PriorityQueue<ProcessSimulator> processQueue = new PriorityQueue<ProcessSimulator>(50, new ArrivalTimeComparator());
+		PriorityQueue<ProcessSimulator> processQueue2 = new PriorityQueue<ProcessSimulator>(50, new RemainingRunTimeComparator());
 		Random rand = new Random();
 		boolean processCompleted = false;
 		
@@ -26,6 +27,7 @@ public class ProcessSimulatorTester{
 			for (int k = 0; k < 50; k++){
 				ProcessSimulator p = new ProcessSimulator(Integer.toString(k), randBetween(0,MAX_QUANTA), randBetween(0.1,10), rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
 				processQueue.add(p);
+				processQueue2.add(p);
 			}
 			/*
 			System.out.println("*********************************************Generated Queue********************************************");
@@ -43,6 +45,15 @@ public class ProcessSimulatorTester{
 			
 			System.out.println();
 			
+			System.out.println("*****************************************Shortest Remaining Run Time*****************************************");
+            ShortestRemainingTime SRT = new ShortestRemainingTime(processQueue2);
+            SRT.runSRT();
+            for (int j = 0; j < SRT.getOutputListing().size(); j++) {
+            	System.out.println(SRT.getOutputListing().get(j));
+            	}
+			
+            System.out.println();
+            
 			System.out.println("***********************************************Round Robin**********************************************");
 			RoundRobin RR = new RoundRobin(processQueue);
 			RR.runRR();
