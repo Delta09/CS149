@@ -8,7 +8,7 @@ import java.util.Random;
  * @author yen_my_huynh
  *
  */
-public class ProcessSimulatorTester {
+public class ProcessSimulatorTester{
 	private static final int MAX_QUANTA = 99;
 	private static final int MAX_PRIORITY = 4;
 	
@@ -18,7 +18,7 @@ public class ProcessSimulatorTester {
 		Random rand = new Random();
 		boolean processCompleted = false;
 		
-		for (int i = 1; i < 6; i++) {
+		for (int i = 1; i < 2; i++) {
 			System.out.println("Run: " + i);
 			
 			// Generator for priority queues
@@ -27,33 +27,32 @@ public class ProcessSimulatorTester {
 				ProcessSimulator p = new ProcessSimulator(Integer.toString(k), randBetween(0,MAX_QUANTA), randBetween(0.1,10), rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
 				processQueue.add(p);
 			}
+			/*
+			System.out.println("*********************************************Generated Queue********************************************");
+			System.out.println(processQueue.toString());
+			System.out.println("********************************************************************************************************");
+			*/
+			
 			
 			System.out.println("*****************************************First Come First Serve*****************************************");
-			FirstComeFirstServed test = new FirstComeFirstServed(processQueue);
-			test.runFCFS();
-			for (int j = 0; j < test.getOutputListing().size(); j++) {
-				System.out.println(test.getOutputListing().get(j));
+			FirstComeFirstServed FCFS = new FirstComeFirstServed(processQueue);
+			FCFS.runFCFS();
+			for (int j = 0; j < FCFS.getOutputListing().size(); j++) {
+				System.out.println(FCFS.getOutputListing().get(j));
+			}
+			
+			System.out.println();
+			
+			System.out.println("***********************************************Round Robin**********************************************");
+			RoundRobin RR = new RoundRobin(processQueue);
+			RR.runRR();
+			
+			for (int j = 0; j < RR.getOutputListing().size(); j++) {
+				System.out.println(RR.getOutputListing().get(j));
 			}
 			
 			processQueue.clear();
 		}
-	}
-	
-	/**
-	 * Generates an array list with different processes inside.
-	 * @return the list of different processes inside
-	 */
-	public static ArrayList<ProcessSimulator> processGenerator(){
-		ArrayList<ProcessSimulator> processList = new ArrayList<ProcessSimulator>();
-		Random rand = new Random();
-		boolean processCompleted = false;
-		for (int i = 0; i < 50; i++){
-			ProcessSimulator p = new ProcessSimulator( Integer.toString(i), randBetween(0,MAX_QUANTA), randBetween(0.1,10), 
-					rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
-			processList.add(p);
-		}
-		Collections.sort(processList, new ArrivalTimeComparator());
-		return processList;
 	}
 	
 	/**
