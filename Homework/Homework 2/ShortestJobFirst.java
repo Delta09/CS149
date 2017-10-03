@@ -11,6 +11,8 @@ public class ShortestJobFirst
 	private ArrayList<ProcessSimulator> processQueue;
 	private ArrayList<ProcessSimulator> processQueueTrack; 
 	public ArrayList<String> outputListing;
+	protected ArrayList<String> TimeTrack;
+	
 	private int quanta; 
 	
 	/**
@@ -22,6 +24,7 @@ public class ShortestJobFirst
 		this.processQueue = processQueue;
 		this.processQueueTrack = new ArrayList<ProcessSimulator>();
 		this.outputListing = new ArrayList<String>();
+		this.TimeTrack = new ArrayList<>();
 		this.quanta = 0;
 	}
 	
@@ -42,9 +45,15 @@ public class ShortestJobFirst
 		while (!processFinished && quanta < 100){
 			currentProcess = processQueue.get(count);
 			
+			if (!currentProcess.isVisited()) {
+				currentProcess.setFirstQuanta(quanta);
+				currentProcess.setVisited(true);
+			}
+			
 			// runs and waits until the process arrives and increases quanta during the wait.
 			while (currentProcess.getArrivalTime() > quanta){
 				quanta++;
+				TimeTrack.add("Idle");
 			}
 			
 			// Runs the current process until the end of expected run time.
@@ -53,6 +62,7 @@ public class ShortestJobFirst
 			int i = 0;
 			while (i != runTime){
 				i++;
+				TimeTrack.add(currentProcess.getId());
 				if (i == runTime){
 					// when a process is completed, adds it to the ArrayList
 					currentProcess.setProcessCompleted(true);
@@ -68,7 +78,7 @@ public class ShortestJobFirst
 				currentProcess.setFinishedTime(currentProcess.getArrivalTime(), currentProcess.getExpectedRunTime());
 				currentProcess.setTurnAroundTime(currentProcess.getFinishedTime(), currentProcess.getArrivalTime());
 				currentProcess.setWaitingTime(currentProcess.getTurnAroundTime(), currentProcess.getExpectedRunTime());
-				currentProcess.setResponseTime(currentProcess.getWaitingTime());
+				currentProcess.setResponseTime(currentProcess.getFirstQuanta());
 				firstProcess = false;
 			}	
 			// processes after the first one
@@ -76,7 +86,7 @@ public class ShortestJobFirst
 				currentProcess.setFinishedTime(quanta, currentProcess.getExpectedRunTime());
 				currentProcess.setTurnAroundTime(currentProcess.getFinishedTime(), currentProcess.getArrivalTime());
 				currentProcess.setWaitingTime(currentProcess.getTurnAroundTime(), currentProcess.getExpectedRunTime());
-				currentProcess.setResponseTime(currentProcess.getWaitingTime());
+				currentProcess.setResponseTime(currentProcess.getFirstQuanta());
 			}
 			
 			// sets quanta as the new arrival time for the next process.
@@ -101,26 +111,39 @@ public class ShortestJobFirst
 		float turnAroundTimeTotal = 0;
 		float waitingTimeTotal = 0;
 		float responseTimeTotal = 0;
-		String timeChart = "";
-		
+		String stats = "";
+
 		for (ProcessSimulator p : processQueueTrack){
 			turnAroundTimeTotal += p.getTurnAroundTime();
 			waitingTimeTotal += p.getWaitingTime();
 			responseTimeTotal += p.getResponseTime();
+			
 			outputListing.add(p.toString());
 		}
 		// gathers up all the statistics
-		float averageTurnAroundTime = turnAroundTimeTotal/ processQueue.size();
-		float averageWaitingTime = waitingTimeTotal/ processQueue.size();
-		float averageResponseTime = responseTimeTotal/ processQueue.size();
+		float averageTurnAroundTime = turnAroundTimeTotal/ processQueueTrack.size();
+		float averageWaitingTime = waitingTimeTotal/ processQueueTrack.size();
+		float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
 		// casts throughtput to avoid truncating
 		float throughput = (float) processQueueTrack.size()/ 100;
-		String timeChartDisplay = "\n" + "Time Chart:" + timeChart;
+
+		String track = new String();
+		int quanta=0;
+		for (String p : TimeTrack){
+			track += ("Q(" + quanta +")="+p + ", ");
+			quanta++;
+			if (quanta%10 == 0) {
+				track += "\n";
+			}
+
+		}
+		String timeChartDisplay = "\nTime Chart per quantum (Q): \n \n"+track+"\n";
 		outputListing.add(timeChartDisplay);
-		timeChartDisplay = "Average Turnaround Time: " + averageTurnAroundTime + "\tAverage Waiting Time: "
+
+		stats = "Average Turnaround Time: " + averageTurnAroundTime + "\tAverage Waiting Time: "
 				+ averageWaitingTime + "\tAverage Response Time: " + averageResponseTime + "\tThroughput: "
 				+ throughput + "\n";
-		outputListing.add(timeChartDisplay);
+		outputListing.add(stats);
 	}
 	
 	/**

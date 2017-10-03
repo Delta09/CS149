@@ -11,76 +11,93 @@ import java.util.PriorityQueue;
 public class RoundRobin {
 	protected PriorityQueue<ProcessSimulator> processQueue;
 	protected ArrayList<ProcessSimulator> processQueueTrack;
-	protected ArrayList<String> TimeTrack;
+	protected ArrayList<ProcessSimulator> TimeTrack;
 	private ArrayList<String> outputListing;
 	private LinkedList<ProcessSimulator> waiting;
+	private LinkedList<ProcessSimulator> toAdd;
 	private int quanta;
+	private int quantumSlice;
 
 
-	public RoundRobin(PriorityQueue<ProcessSimulator> processQueue) {
+	public RoundRobin(PriorityQueue<ProcessSimulator> processQueue, int quantumSlice) {
 		this.processQueue = processQueue;
 		this.processQueueTrack = new ArrayList<>();
 		this.TimeTrack = new ArrayList<>();
 		this.outputListing = new ArrayList<>();
+		this.waiting = new LinkedList<ProcessSimulator>();
+		this.toAdd = new LinkedList<ProcessSimulator>();
 		this.quanta = 0;
+		this.quantumSlice = quantumSlice;
 	}
 
 	/**
 	 * Runs RR scheduling algorithm.
+	 * Assumes that process blocks the rest of the quantum slice once completed
 	 */
 	public void runRR(){
 		ProcessSimulator currentProcess, incomingProcess;
+		ProcessSimulator idleProcess = new ProcessSimulator("Idle", 0.0f, 0.0f, 0, false); 
 		waiting = new LinkedList<ProcessSimulator>();
-
 		// runs when all processes are not all finished and is less than 100 quantum.
 		while (quanta < 100){
-
-			if (processQueue.size() > 0 && processQueue.peek().getArrivalTime() == quanta ) {
-
-				while(processQueue.size() > 0 && processQueue.peek().getArrivalTime() == quanta) {
+			if (processQueue.size() > 0 && processQueue.peek().getArrivalTime() <= quanta ) {
+				
+				while(processQueue.size() > 0 && processQueue.peek().getArrivalTime() <= quanta) {
 					incomingProcess = processQueue.poll();					//incoming process = new guy
-					waiting.add(incomingProcess);
+
+						toAdd.add(incomingProcess);
 				}
-
+				
+				if (!toAdd.isEmpty()) {				
+					waiting.addAll(0, toAdd);
+					toAdd.clear();
+				}
 			}
-
 
 			if (!waiting.isEmpty()) {
 				currentProcess = waiting.pollFirst();
+				
+				currentProcess.setVisitedQuanta(quanta);
+				
+				if (!currentProcess.isVisited()) {
+					currentProcess.setFirstQuanta(quanta);
+					currentProcess.setVisited(true);
+				}
+				
+				TimeTrack.add(currentProcess);
 
-				TimeTrack.add(currentProcess.getId());
-
-				currentProcess.setRemainingRunTime(currentProcess.getRemainingRunTime()-1);
-				quanta++;
-
-
+				currentProcess.setRemainingRunTime(currentProcess.getRemainingRunTime()-quantumSlice);
+				quanta+= quantumSlice;
+				
+				
 
 				if (currentProcess.getRemainingRunTime() > 0) {
 					waiting.add(currentProcess);
 				}
 
-				else {
-					currentProcess.setFinishedTime(currentProcess.getArrivalTime(), quanta);
+				else{
+					//quanta += currentProcess.getRemainingRunTime();
+					currentProcess.setFinishedTime(0, quanta);
 					currentProcess.setTurnAroundTime(currentProcess.getFinishedTime(), currentProcess.getArrivalTime());
 					currentProcess.setWaitingTime(currentProcess.getTurnAroundTime(), currentProcess.getExpectedRunTime());
-					currentProcess.setResponseTime(currentProcess.getWaitingTime());
-
+					currentProcess.setResponseTime( currentProcess.getFirstQuanta());
 					processQueueTrack.add(currentProcess);
+					
 				}
+
 
 
 
 			}
 
 			else {
-				quanta++;
-				TimeTrack.add("Idle");
-
+				
+				idleProcess.setVisitedQuanta(quanta);
+				TimeTrack.add(idleProcess);
+				quanta+= 1;
 			}
 
 		}
-
-
 
 
 		printStatistics(processQueueTrack);
@@ -96,29 +113,30 @@ public class RoundRobin {
 		float waitingTimeTotal = 0;
 		float responseTimeTotal = 0;
 		String stats = "";
-		String timeChart = "";
 
 		for (ProcessSimulator p : processQueueTrack){
 			turnAroundTimeTotal += p.getTurnAroundTime();
 			waitingTimeTotal += p.getWaitingTime();
 			responseTimeTotal += p.getResponseTime();
-			
+
 			outputListing.add(p.toString());
 		}
 		// gathers up all the statistics
-		float averageTurnAroundTime = turnAroundTimeTotal/ processQueue.size();
-		float averageWaitingTime = waitingTimeTotal/ processQueue.size();
-		float averageResponseTime = responseTimeTotal/ processQueue.size();
+		float averageTurnAroundTime = turnAroundTimeTotal/ processQueueTrack.size();
+
+		float averageWaitingTime = waitingTimeTotal/ processQueueTrack.size();
+
+		float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
+
 		// casts throughtput to avoid truncating
-		float throughput = (float) processQueueTrack.size()/ 50;
+		float throughput = (float) processQueueTrack.size()/ 99;
 
 		String track = new String();
-		System.out.println("Time Chart:" );
-		int quanta=0;
-		for (String p : TimeTrack){
-			track += ("Q(" + quanta +")="+p + ", ");
-			quanta++;
-			if (quanta%10 == 0) {
+		int count=0;
+		for (ProcessSimulator p : TimeTrack){
+			track += ("Q(" + p.getVisitedtQuanta() +")=" + p.getId() + ", ");
+			count++;
+			if (count%10 == 0) {
 				track += "\n";
 			}
 

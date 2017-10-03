@@ -11,7 +11,7 @@ public class FirstComeFirstServed {
 	protected ArrayList<ProcessSimulator> processQueueTrack;
 	private ArrayList<String> outputListing;
 	private int quanta;
-	private ArrayList<ProcessSimulator> processTimeTrack;
+	private ArrayList<String> processTimeTrack;
 	
 	/**
 	 * Constructs objects for First-come first-served class.
@@ -37,19 +37,26 @@ public class FirstComeFirstServed {
 		while (!processFinished && quanta < 100){
 			currentProcess = processQueue.poll();
 			
+			System.out.println(currentProcess);
 			
 			// runs and waits until the process arrives and increases quanta during the wait.
 			while (currentProcess.getArrivalTime() > quanta){
 				quanta++;
+				processTimeTrack.add("Idle");
 			}
 			
 			// Runs the current process until the end of expected run time.
 			// if 5s is given, then runs until reaches 5s.
 			int runTime = (int) currentProcess.getExpectedRunTime();
+			if (!currentProcess.isVisited()) {
+				currentProcess.setFirstQuanta(quanta);
+				currentProcess.setVisited(true);
+			}
+			
 			int i = 0;
 			while (i != runTime){
 				i++;
-				processTimeTrack.add(currentProcess);
+				processTimeTrack.add(currentProcess.getId());
 				if (i == runTime){
 					currentProcess.setProcessCompleted(false);
 					processQueueTrack.add(currentProcess);
@@ -72,7 +79,7 @@ public class FirstComeFirstServed {
 				currentProcess.setFinishedTime(quanta, currentProcess.getExpectedRunTime());
 				currentProcess.setTurnAroundTime(currentProcess.getFinishedTime(), currentProcess.getArrivalTime());
 				currentProcess.setWaitingTime(currentProcess.getTurnAroundTime(), currentProcess.getExpectedRunTime());
-				currentProcess.setResponseTime(currentProcess.getWaitingTime());
+				currentProcess.setResponseTime(currentProcess.getFirstQuanta());
 			}
 			
 			// sets quanta as the new arrival time for the next process.
@@ -96,7 +103,7 @@ public class FirstComeFirstServed {
 		float turnAroundTimeTotal = 0;
 		float waitingTimeTotal = 0;
 		float responseTimeTotal = 0;
-		String timeChart = "";
+		
 		
 		for (ProcessSimulator p : processQueueTrack){
 			turnAroundTimeTotal += p.getTurnAroundTime();
@@ -110,13 +117,13 @@ public class FirstComeFirstServed {
 		float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
 		
 		// casts throughtput to avoid truncating
-		float throughput = (float) processQueueTrack.size()/ 50;
+		float throughput = (float) processQueueTrack.size()/ 99;
         
         String track = new String();
         int quantumCount = 0;
-        for (ProcessSimulator p : processTimeTrack){
+        for (String p : processTimeTrack){
 
-            track += "Q("+quantumCount+")="+p.id() + ", ";
+            track += "Q("+quantumCount+")="+p + ", ";
             quantumCount++;
             
             if (quantumCount%10 == 0) {
