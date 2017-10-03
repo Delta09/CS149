@@ -91,13 +91,12 @@ public class ShortestRemainingTime {
 		float waitingTimeTotal = 0;
 		float responseTimeTotal = 0;
 		String timeChart = "";
-		int count = 0;
 		
 		for (ProcessSimulator p : processQueueTrack){
 			turnAroundTimeTotal += p.getTurnAroundTime();
 			waitingTimeTotal += p.getWaitingTime();
 			responseTimeTotal += p.getResponseTime();
-		
+
 			outputListing.add(p.toString());
 		}
 		// gathers up all the statistics
