@@ -17,6 +17,8 @@ public class HighestPriorityFirstP{
 	private PriorityQueue<ProcessSimulator> pQ4;
 	private ArrayDeque<ProcessSimulator> processQueue; //an array with all the processes
 	private ArrayList<PriorityQueue<ProcessSimulator>> processList;
+	protected ArrayList<ProcessSimulator> TimeTrack;
+	private LinkedList<ProcessSimulator> toAdd;
 	private int quanta; //current quanta
 	private float waitTime = 0; //wait time for a process
 	private float turnAroundTime = 0; //turnAround time for a process
@@ -34,7 +36,10 @@ public class HighestPriorityFirstP{
 		pQ3 = new PriorityQueue<ProcessSimulator>(new ArrivalTimeComparator());
 		pQ4 = new PriorityQueue<ProcessSimulator>(new ArrivalTimeComparator());
 		outputListing = new ArrayList<String>();
-
+		this.TimeTrack = new ArrayList<>();
+		
+		this.toAdd = new LinkedList<ProcessSimulator>();
+		
 		//initialize instance variables
 		this.processQueue = tprocessQueue;
 		this.processQueueTrack = new ArrayList<ProcessSimulator>();
@@ -69,7 +74,6 @@ public class HighestPriorityFirstP{
 				}
 			}
 			increaseWaitedQuantum();
-			
 			// if the list is all separated in specific priority order, then
 			// allows to retrieves processes from first priority, second... fourth.
 			// prevent going over quanta by increment it.
@@ -103,33 +107,21 @@ public class HighestPriorityFirstP{
 private void runProcess(ProcessSimulator currentProcess, PriorityQueue<ProcessSimulator> currentQueue) {
 		ProcessSimulator incomingProcess;// = currentQueue.poll();
 		waiting = new LinkedList<ProcessSimulator>();
+		ProcessSimulator idleProcess = new ProcessSimulator("Idle", 0.0f, 0.0f, 0, false); 
 
 		// runs when all processes are not all finished and is less than 100
 		// quantum.
 		while (quanta < 100){ 
-		if (currentQueue.size() > 0 && currentQueue.peek().getArrivalTime() == quanta) {
-			while (currentQueue.size() > 0 && currentQueue.peek().getArrivalTime() == quanta) {
+		if (currentQueue.size() > 0 && currentQueue.peek().getArrivalTime() <= quanta) {
+			while(currentQueue.size() > 0 && currentQueue.peek().getArrivalTime() <= quanta) {
+				incomingProcess = currentQueue.poll();					//incoming process = new guy
 
-				incomingProcess = currentQueue.poll(); // incoming process = new
-														// guy
-				float t = incomingProcess.getRemainingRunTime();
-				incomingProcess.setRemainingRunTime(t - 1);
-
-				quanta++;
-
-				if (incomingProcess.getRemainingRunTime() > 0) {
-					waiting.add(incomingProcess);
-				} else {
-					incomingProcess.setFinishedTime(incomingProcess.getArrivalTime(), quanta);
-					incomingProcess.setTurnAroundTime(incomingProcess.getFinishedTime(),
-							incomingProcess.getArrivalTime());
-					incomingProcess.setWaitingTime(incomingProcess.getTurnAroundTime(),
-							incomingProcess.getExpectedRunTime());
-					incomingProcess.setResponseTime(incomingProcess.getWaitingTime());
-
-					processQueueTrack.add(incomingProcess);
-				}
-
+					toAdd.add(incomingProcess);
+			}
+			
+			if (!toAdd.isEmpty()) {				
+				waiting.addAll(0, toAdd);
+				toAdd.clear();
 			}
 
 		}
@@ -137,26 +129,52 @@ private void runProcess(ProcessSimulator currentProcess, PriorityQueue<ProcessSi
 		else if (waiting.isEmpty()) {
 			quanta++;
 		}
-
-		else {
+		
+		if (!waiting.isEmpty()) {
 			currentProcess = waiting.pollFirst();
-			currentProcess.setRemainingRunTime(currentProcess.getRemainingRunTime() - 1);
-			quanta++;
+			
+			currentProcess.setVisitedQuanta(quanta);
+			
+			if (!currentProcess.isVisited()) {
+				currentProcess.setFirstQuanta(quanta);
+				currentProcess.setVisited(true);
+			}
+			
+			TimeTrack.add(currentProcess);
+
+			currentProcess.setRemainingRunTime(currentProcess.getRemainingRunTime()-1);
+			quanta+= 1;
+			
+			
 
 			if (currentProcess.getRemainingRunTime() > 0) {
 				waiting.add(currentProcess);
 			}
 
-			else {
-				currentProcess.setFinishedTime(currentProcess.getArrivalTime(), quanta);
+			else{
+				//quanta += currentProcess.getRemainingRunTime();
+				currentProcess.setFinishedTime(0, quanta);
 				currentProcess.setTurnAroundTime(currentProcess.getFinishedTime(), currentProcess.getArrivalTime());
 				currentProcess.setWaitingTime(currentProcess.getTurnAroundTime(), currentProcess.getExpectedRunTime());
-				currentProcess.setResponseTime(currentProcess.getWaitingTime());
-
+				currentProcess.setResponseTime( currentProcess.getFirstQuanta());
 				processQueueTrack.add(currentProcess);
+				
 			}
+
+
+
+
 		}
-	}
+
+		else {
+			
+			idleProcess.setVisitedQuanta(quanta);
+			TimeTrack.add(idleProcess);
+			quanta+= 1;
+		}
+
+
+		}
 }
 
 /**
@@ -212,8 +230,19 @@ public void printStatistics(ArrayList<ProcessSimulator> processQueueTrack){
 	float averageWaitingTime = waitingTimeTotal/ processQueueTrack.size();
 	float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
 	// casts throughtput to avoid truncating
-	float throughput = (float) processQueueTrack.size()/ 100;
-	String timeChartDisplay = "\n" + "Time Chart:" + timeChart;
+	float throughput = (float) processQueueTrack.size()/ 99;
+
+	String track = new String();
+	int quanta=0;
+	for (ProcessSimulator p : TimeTrack){
+		track += ("Q(" + p.getVisitedtQuanta() +")="+p.getId() + ", ");
+		quanta++;
+		if (quanta%10 == 0) {
+			track += "\n";
+		}
+
+	}
+	String timeChartDisplay = "\nTime Chart per quantum (Q): \n \n"+track+"\n";
 	outputListing.add(timeChartDisplay);
 	timeChartDisplay = "Average Turnaround Time: " + averageTurnAroundTime + "\tAverage Waiting Time: "
 			+ averageWaitingTime + "\tAverage Response Time: " + averageResponseTime + "\tThroughput: "

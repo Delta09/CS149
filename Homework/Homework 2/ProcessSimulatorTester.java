@@ -19,8 +19,12 @@ public class ProcessSimulatorTester {
 
 	// main method
 	public static void main(String args[]) {
-		PriorityQueue<ProcessSimulator> processQueue2 = new PriorityQueue<ProcessSimulator>(100,
-				new RemainingRunTimeComparator());
+		PriorityQueue<ProcessSimulator> processQueue1 = new PriorityQueue<ProcessSimulator>(200, new ArrivalTimeComparator());
+		ArrayList<ProcessSimulator> processQueue2 = new ArrayList<ProcessSimulator>();
+		PriorityQueue<ProcessSimulator> processQueue3 = new PriorityQueue<ProcessSimulator>(200, new RemainingRunTimeComparator());
+		PriorityQueue<ProcessSimulator> processQueue4 = new PriorityQueue<ProcessSimulator>(200, new RemainingRunTimeComparator());
+		ArrayDeque<ProcessSimulator> processQueue5 = new ArrayDeque<ProcessSimulator>();
+		ArrayDeque<ProcessSimulator> processQueue6 = new ArrayDeque<ProcessSimulator>();
 		Random rand = new Random();
 		boolean processCompleted = false;
 
@@ -29,26 +33,43 @@ public class ProcessSimulatorTester {
 
 			// Generator for priority queues with different processes inside.
 			System.out.println("Generating Queue");
-			for (int k = 0; k < 50; k++) {
+			for (int k = 0; k < 200; k++) {
 				ProcessSimulator p = new ProcessSimulator(Integer.toString(k), randBetween(0, MAX_QUANTA),
 						randBetween(0.1, 10), rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
 				
+				processQueue1.add(p);
 				processQueue2.add(p);
+				processQueue3.add(p);
+				processQueue4.add(p);
+				processQueue5.add(p);
+				processQueue6.add(p);
+				
 			}
 
 			System.out.println(
 					"*****************************************First Come First Serve*****************************************");
-			FirstComeFirstServed FCFS = new FirstComeFirstServed(generateNewPriorityQueue());
+			FirstComeFirstServed FCFS = new FirstComeFirstServed(processQueue1);
 			FCFS.runFCFS();
 			for (int j = 0; j < FCFS.getOutputListing().size(); j++) {
 				System.out.println(FCFS.getOutputListing().get(j));
 			}
 
 			System.out.println();
+			
+			System.out.println(
+					"******************************************Shortestest Job First********************************************");
+			ShortestJobFirst SJF = new ShortestJobFirst(processQueue2);
+			SJF.runSJF();
+			for (int j = 0; j < SJF.getOutputListing().size(); j++) {
+				System.out.println(SJF.getOutputListing().get(j));
+			}
+
+			System.out.println();
+
 
 			System.out.println(
 					"***************************************Shortest Remaining Run Time***************************************");
-			ShortestRemainingTime SRT = new ShortestRemainingTime(processQueue2);
+			ShortestRemainingTime SRT = new ShortestRemainingTime(processQueue3);
 			SRT.runSRT();
 			for (int j = 0; j < SRT.getOutputListing().size(); j++) {
 				System.out.println(SRT.getOutputListing().get(j));
@@ -58,7 +79,7 @@ public class ProcessSimulatorTester {
 
 			System.out.println(
 					"*************************************************Round Robin***********************************************");
-			RoundRobin RR = new RoundRobin(generateNewPriorityQueue());
+			RoundRobin RR = new RoundRobin(processQueue4, 1);
 			RR.runRR();
 
 			for (int j = 0; j < RR.getOutputListing().size(); j++) {
@@ -66,18 +87,9 @@ public class ProcessSimulatorTester {
 			}
 			System.out.println();
 			
-			System.out.println(
-					"******************************************Shortestest Job First********************************************");
-			ShortestJobFirst SJF = new ShortestJobFirst(generateNewAList());
-			SJF.runSJF();
-			for (int j = 0; j < SJF.getOutputListing().size(); j++) {
-				System.out.println(SJF.getOutputListing().get(j));
-			}
-
-			System.out.println();
-
+			
 			 System.out.println("******************************Highest Priority First Non-Preemptive******************************");
-			 HighestPriorityFirstNP HPFNP = new HighestPriorityFirstNP(generateNewArrayDeque());
+			 HighestPriorityFirstNP HPFNP = new HighestPriorityFirstNP(processQueue5);
 			 HPFNP.runHPFNP();
 			 for (int j = 0; j < HPFNP.getOutputListing().size(); j++) {
 			 System.out.println(HPFNP.getOutputListing().get(j));
@@ -86,7 +98,7 @@ public class ProcessSimulatorTester {
 			 System.out.println();
 			
 			 System.out.println("********************************Highest Priority First Preemptive********************************");
-			 HighestPriorityFirstP HPFP = new HighestPriorityFirstP(generateNewArrayDeque());
+			 HighestPriorityFirstP HPFP = new HighestPriorityFirstP(processQueue6);
 			 HPFP.runHPFP();	 
 			 for (int j = 0; j < HPFP.getOutputListing().size(); j++) {
 			 System.out.println(HPFP.getOutputListing().get(j));
@@ -155,10 +167,11 @@ public class ProcessSimulatorTester {
 		return processes;
 	}
 	
+	
 	/**
 	 * Creating a new priority queue with different processes
 	 * @return a new priority queue with different processes
-	 */
+	 *//*
 	private static PriorityQueue<ProcessSimulator> generateNewPriorityQueue() {
 		PriorityQueue<ProcessSimulator> processQueue = new PriorityQueue<>(100, new ArrivalTimeComparator());
 		boolean processCompleted = false;
@@ -170,6 +183,6 @@ public class ProcessSimulatorTester {
 			processQueue.add(p);
 		}
 		return processQueue;
-	}
+	}*/
 	
 }

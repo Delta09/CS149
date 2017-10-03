@@ -11,7 +11,7 @@ public class FirstComeFirstServed {
 	protected ArrayList<ProcessSimulator> processQueueTrack;
 	private ArrayList<String> outputListing;
 	private int quanta;
-	private ArrayList<String> processTimeTrack;
+	private ArrayList<String> TimeTrack;
 	
 	/**
 	 * Constructs objects for First-come first-served class.
@@ -21,7 +21,7 @@ public class FirstComeFirstServed {
 		this.processQueue = processQueue;
 		this.processQueueTrack = new ArrayList<>();
 		this.outputListing = new ArrayList<>();
-        this.processTimeTrack = new ArrayList<>();
+        this.TimeTrack = new ArrayList<>();
 		this.quanta = 0;
 	}
 	
@@ -42,7 +42,7 @@ public class FirstComeFirstServed {
 			// runs and waits until the process arrives and increases quanta during the wait.
 			while (currentProcess.getArrivalTime() > quanta){
 				quanta++;
-				processTimeTrack.add("Idle");
+				TimeTrack.add("Idle");
 			}
 			
 			// Runs the current process until the end of expected run time.
@@ -56,7 +56,7 @@ public class FirstComeFirstServed {
 			int i = 0;
 			while (i != runTime){
 				i++;
-				processTimeTrack.add(currentProcess.getId());
+				TimeTrack.add(currentProcess.getId());
 				if (i == runTime){
 					currentProcess.setProcessCompleted(false);
 					processQueueTrack.add(currentProcess);
@@ -121,7 +121,7 @@ public class FirstComeFirstServed {
         
         String track = new String();
         int quantumCount = 0;
-        for (String p : processTimeTrack){
+        for (String p : TimeTrack){
 
             track += "Q("+quantumCount+")="+p + ", ";
             quantumCount++;

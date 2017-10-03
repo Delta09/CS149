@@ -124,7 +124,7 @@ public class ShortestJobFirst
 		float averageWaitingTime = waitingTimeTotal/ processQueueTrack.size();
 		float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
 		// casts throughtput to avoid truncating
-		float throughput = (float) processQueueTrack.size()/ 100;
+		float throughput = (float) processQueueTrack.size()/ 99;
 
 		String track = new String();
 		int quanta=0;
