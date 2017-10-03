@@ -22,7 +22,7 @@ public class ProcessSimulatorTester {
 		PriorityQueue<ProcessSimulator> processQueue1 = new PriorityQueue<ProcessSimulator>(200, new ArrivalTimeComparator());
 		ArrayList<ProcessSimulator> processQueue2 = new ArrayList<ProcessSimulator>();
 		PriorityQueue<ProcessSimulator> processQueue3 = new PriorityQueue<ProcessSimulator>(200, new RemainingRunTimeComparator());
-		PriorityQueue<ProcessSimulator> processQueue4 = new PriorityQueue<ProcessSimulator>(200, new RemainingRunTimeComparator());
+		PriorityQueue<ProcessSimulator> processQueue4 = new PriorityQueue<ProcessSimulator>(200, new ArrivalTimeComparator());
 		ArrayDeque<ProcessSimulator> processQueue5 = new ArrayDeque<ProcessSimulator>();
 		ArrayDeque<ProcessSimulator> processQueue6 = new ArrayDeque<ProcessSimulator>();
 		Random rand = new Random();
@@ -31,11 +31,10 @@ public class ProcessSimulatorTester {
 		for (int i = 1; i < 6; i++) {
 			System.out.println("Run: " + i);
 
+			System.out.println("*********************************************Generated Queue********************************************");
 			// Generator for priority queues with different processes inside.
-			System.out.println("Generating Queue");
 			for (int k = 0; k < 200; k++) {
-				ProcessSimulator p = new ProcessSimulator(Integer.toString(k), randBetween(0, MAX_QUANTA),
-						randBetween(0.1, 10), rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
+				ProcessSimulator p = new ProcessSimulator(Integer.toString(k), randBetween(0, MAX_QUANTA),randBetween(0.1, 10), rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
 				
 				processQueue1.add(p);
 				processQueue2.add(p);
@@ -43,11 +42,13 @@ public class ProcessSimulatorTester {
 				processQueue4.add(p);
 				processQueue5.add(p);
 				processQueue6.add(p);
-				
+				System.out.println(p);
 			}
-
-			System.out.println(
-					"*****************************************First Come First Serve*****************************************");
+			System.out.println("********************************************************************************************************");
+			
+			System.out.println();
+			
+			System.out.println("*****************************************First Come First Serve*****************************************");
 			FirstComeFirstServed FCFS = new FirstComeFirstServed(processQueue1);
 			FCFS.runFCFS();
 			for (int j = 0; j < FCFS.getOutputListing().size(); j++) {
@@ -105,6 +106,10 @@ public class ProcessSimulatorTester {
 			 }
 			
 			 System.out.println();
+			 System.out.println();
+			 System.out.println();
+			 
+			 
 		}
 		processQueue2.clear();
 	}
@@ -119,70 +124,6 @@ public class ProcessSimulatorTester {
 		return (float) (min + Math.round(Math.random() * (max - min)));
 	}
 	
-	/**
-	 * Creating a new array deque with different processes
-	 * @return a new array deque with different processes
-	 */
-	private static ArrayDeque<ProcessSimulator> generateNewArrayDeque() {
-		ArrayList<ProcessSimulator> processList = new ArrayList<>();
-		ArrayDeque<ProcessSimulator> processQueue = new ArrayDeque<>();
-		boolean processCompleted = false;
-		Random rand = new Random();
-		for (int i = 0; i < 100; i++) 
-		{
-			ProcessSimulator p = new ProcessSimulator(Integer.toString(i), randBetween(0, MAX_QUANTA),
-					randBetween(0.1, 10), rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
-			processList.add(p);
-		}
-
-		Collections.sort(processList, new Comparator<ProcessSimulator>() {
-			public int compare(ProcessSimulator o1, ProcessSimulator o2) {
-				return (int) (o1.getArrivalTime() - o2.getArrivalTime());
-			}
-		});
-
-		for (ProcessSimulator p : processList) {
-			processQueue.add(p);
-		}
-		return processQueue;
-	}
 	
-	/**
-	 * Creating a new array list with different processes
-	 * @return a new array list with different processes
-	 */
-	private static ArrayList<ProcessSimulator> generateNewAList() {
-		// For other processing scheduling algorithms
-		ArrayList<ProcessSimulator> processes = new ArrayList<ProcessSimulator>();
-		boolean processCompleted = false; 
-
-		// Create 100 processes
-		for (int i = 0; i < 100; i++) {
-			Random rand = new Random();
-			ProcessSimulator p = new ProcessSimulator(Integer.toString(i), randBetween(0, MAX_QUANTA),
-					randBetween(0.1, 10), rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
-			processes.add(p);
-		}
-		Collections.sort(processes, new ArrivalTimeComparator());
-		return processes;
-	}
-	
-	
-	/**
-	 * Creating a new priority queue with different processes
-	 * @return a new priority queue with different processes
-	 *//*
-	private static PriorityQueue<ProcessSimulator> generateNewPriorityQueue() {
-		PriorityQueue<ProcessSimulator> processQueue = new PriorityQueue<>(100, new ArrivalTimeComparator());
-		boolean processCompleted = false;
-		Random rand = new Random();
-		for (int i = 0; i < 100; i++) 
-		{
-			ProcessSimulator p = new ProcessSimulator(Integer.toString(i), randBetween(0, MAX_QUANTA),
-					randBetween(0.1, 10), rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
-			processQueue.add(p);
-		}
-		return processQueue;
-	}*/
 	
 }
