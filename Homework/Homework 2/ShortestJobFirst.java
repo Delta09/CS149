@@ -4,7 +4,6 @@ import java.util.*;
  * Models a ShortestJobFirst class to serve processes in shortest run time first.
  * @author sandeepsamra
  * @author Pulkit Agrawal
- * @author yen_my_huynh
  */
 public class ShortestJobFirst
 {
