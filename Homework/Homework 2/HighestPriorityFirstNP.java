@@ -21,9 +21,6 @@ public class HighestPriorityFirstNP {
 	private float turnAroundTime;
 	private float responseTime;
 
-	// save the processes created in the tester
-	
-
 	/**
 	 * Constructor for HPF-NPE, with a ArrayDeque of processes to be scheduled
 	 * passed in
@@ -46,6 +43,9 @@ public class HighestPriorityFirstNP {
 		outputListing = new ArrayList<String>();
 
 		quanta = 0;
+		waitingTime = 0;
+		turnAroundTime = 0;
+		responseTime = 0;
 	}
 
 	/**
@@ -74,13 +74,13 @@ public class HighestPriorityFirstNP {
 			// runs processes by priority. If the first priority queues has no more processes 
 			// to run, move onto the next priority queues.
 			if (!pQ1.isEmpty()) {
-				runProcess(pQ1.poll());
+				runProcess(pQ1.poll(), pQ1);
 			} else if (!pQ2.isEmpty()) {
-				runProcess(pQ2.poll());
+				runProcess(pQ2.poll(), pQ2);
 			} else if (!pQ3.isEmpty()) {
-				runProcess(pQ3.poll());
+				runProcess(pQ3.poll(), pQ3);
 			} else if (!pQ4.isEmpty()) {
-				runProcess(pQ4.poll());
+				runProcess(pQ4.poll(), pQ4);
 			}
 		} 
 		printStatistics(processQueueTrack);
@@ -90,30 +90,59 @@ public class HighestPriorityFirstNP {
 	 * Runs first priority queue, and so on if time allows.
 	 * @param currentProcess the current process
 	 */
-	private void runProcess(ProcessSimulator currentProcess) {
-		waitingTime = currentProcess.getWaitingTime();
-		turnAroundTime = currentProcess.getTurnAroundTime();
-		responseTime = currentProcess.getResponseTime();
-		// every time a service is performing, increases quanta and puts a completed process
-		// inside the completed queue track.
-		if (currentProcess.getExpectedRunTime() > 0) {
-			currentProcess.setResponseTime(quanta - currentProcess.getArrivalTime());
-			quanta += currentProcess.getExpectedRunTime();
-			processQueueTrack.add(currentProcess);
-			currentProcess.setFinishedTime(quanta, currentProcess.getExpectedRunTime());
-			currentProcess.setTurnAroundTime(currentProcess.getFinishedTime(), currentProcess.getArrivalTime());
-			currentProcess.setWaitingTime(currentProcess.getTurnAroundTime(), currentProcess.getExpectedRunTime());
-
+	private void runProcess(ProcessSimulator currentProcess, PriorityQueue<ProcessSimulator> currentQueue) {
+		boolean processFinished = false;
+		boolean firstProcess =  true;
+		
+		// runs when all processes are not all finished and is less than 100 quantum.
+		while (!processFinished && quanta < 100){
+			currentProcess = currentQueue.poll();
+			
+			// runs and waits until the process arrives and increases quanta during the wait.
+			while (currentProcess.getArrivalTime() > quanta){
+				quanta++;
+			}
+			
+			// Runs the current process until the end of expected run time.
+			// if 5s is given, then runs until reaches 5s.
+			int runTime = (int) currentProcess.getExpectedRunTime();
+			int i = 0;
+			while (i != runTime){
+				i++;
+				if (i == runTime){
+					currentProcess.setProcessCompleted(true);
+					processQueueTrack.add(currentProcess);
+				}
+			}
+			// resets the time for the next process.
+			runTime = 0;
+			
+			// if it's the first process, then run. After that, sets it to false, so other processes 
+			// after it can run.
+			if (firstProcess == true){ 
+				currentProcess.setFinishedTime(currentProcess.getArrivalTime(), currentProcess.getExpectedRunTime());
+				currentProcess.setTurnAroundTime(currentProcess.getFinishedTime(), currentProcess.getArrivalTime());
+				currentProcess.setWaitingTime(currentProcess.getTurnAroundTime(), currentProcess.getExpectedRunTime());
+				currentProcess.setResponseTime(currentProcess.getWaitingTime());
+				firstProcess = false;
+			}	
+			// processes after the first one
+			else {
+				currentProcess.setFinishedTime(quanta, currentProcess.getExpectedRunTime());
+				currentProcess.setTurnAroundTime(currentProcess.getFinishedTime(), currentProcess.getArrivalTime());
+				currentProcess.setWaitingTime(currentProcess.getTurnAroundTime(), currentProcess.getExpectedRunTime());
+				currentProcess.setResponseTime(currentProcess.getWaitingTime());
+			}
+			
+			// sets quanta as the new arrival time for the next process.
+			quanta = (int) currentProcess.getFinishedTime();
+			
+			// loops through the PriorityQueue list to check if they're done or not.
+			// Not all processes will run since the simulator only has 100 quantum
+			for (ProcessSimulator p : currentQueue) {
+				processFinished = p.isProcessCompleted();
+			}
 		}
-		// add times after a process is finished and added into the process queue track.
-		if (currentProcess.getExpectedRunTime() <= 1) {
-			responseTime += currentProcess.getExpectedRunTime();
-		}
-		else {
-			responseTime += 1;
-		}
-		waitingTime += currentProcess.getArrivalTime() - currentProcess.getExpectedRunTime();
-		turnAroundTime += (quanta - currentProcess.getArrivalTime());
 	}
 
 	/**
@@ -171,7 +200,7 @@ public class HighestPriorityFirstNP {
 		float averageWaitingTime = waitingTimeTotal/ processQueueTrack.size();
 		float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
 		// casts throughtput to avoid truncating
-		float throughput = (float) processQueueTrack.size()/ 99;
+		float throughput = (float) processQueueTrack.size()/ 100;
 		String timeChartDisplay = "\n" + "Time Chart:" + timeChart;
 		outputListing.add(timeChartDisplay);
 		timeChartDisplay = "Average Turnaround Time: " + averageTurnAroundTime + "\tAverage Waiting Time: "
@@ -187,5 +216,4 @@ public class HighestPriorityFirstNP {
 	public ArrayList<String> getOutputListing(){
 		return outputListing;
 	}
-
 }
