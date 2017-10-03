@@ -10,12 +10,14 @@ public class ShortestRemainingTime {
         //The priority queue below will be sorted by Remaining Run Time
         protected PriorityQueue<ProcessSimulator> runtimeQueue = new PriorityQueue<ProcessSimulator>(50, new RemainingRunTimeComparator()); 
 	protected ArrayList<ProcessSimulator> processQueueTrack;
+        protected ArrayList<ProcessSimulator> processTimeTrack;
 	private ArrayList<String> outputListing;
 	private int quanta;
         
         public ShortestRemainingTime(PriorityQueue<ProcessSimulator> processQueue){
 		this.processQueue = processQueue;
 		this.processQueueTrack = new ArrayList<>();
+                this.processTimeTrack = new ArrayList<>();
 		this.outputListing = new ArrayList<>();
 		this.quanta = 0;
 	}
@@ -23,42 +25,60 @@ public class ShortestRemainingTime {
 		
 		ProcessSimulator currentProcess;
                 
-		// runs when all processes are not all finished and is less than 100 quantum.
+		// runs when less than 100 quantum.
 		while (quanta < 100){
-                        if (runtimeQueue.peek()==null){
+                        if (runtimeQueue.peek()==null){ //RuntimeQueue will be null at first so peeking it will result in Error..
                             
+                            //Increment quanta until first process arrives.
                             while(quanta <= processQueue.peek().getArrivalTime()){
                                 quanta++;
                             }
                         }
+                        
+                        /*There is an NullPointerException here because processQueue will run out and become empty before
+                         *quanta reeaches 100. Throwing the exception is a faster alternative to figuring out how to fix it.*/
                         try {
+                            //There may be multiple process with the same Arrival Time. Add all into runtimeQueue.
                             while (processQueue.peek().getArrivalTime() <= quanta && processQueue.peek() != null){
-                                //System.out.println("Arrival time "+processQueue.peek().getArrivalTime());
+                                //Debugging code: System.out.println("Arrival time "+processQueue.peek().getArrivalTime());
                                 runtimeQueue.add(processQueue.poll());
-                        }
+                            }
                         } catch (NullPointerException e) {
-                            //System.out.println("NullPointer Exceptiono Caught!");
+                            //Debugging code: System.out.println("NullPointer Exceptiono Caught!");
                         }
-                            
+                        
+                        //Take the process with the lowest Remaining Run Time and set it to current process.
                         currentProcess = runtimeQueue.poll();
                         
+                        //CPU gives 1 quantum to the current Process, therefore runtime decreases by 1.
                         currentProcess.setRemainingRunTime(currentProcess.getRemainingRunTime()-1);
+                        
+                        /*As long as the current process has remaining runtime, put it back in runtimeQueue.
+                         *REMEMBER: runtimeQueue will give out processes with the lowest runtime*/
                         if(currentProcess.getRemainingRunTime()>0){
                             runtimeQueue.add(currentProcess);
-                            processQueueTrack.add(currentProcess);
+                            processTimeTrack.add(currentProcess);
                         }
                         else{
+                            //If current process finishes, set its status to true.
                             currentProcess.setProcessCompleted(true);
                             processQueueTrack.add(currentProcess);
-				currentProcess.setFinishedTime(0, quanta+1);
+                            processTimeTrack.add(currentProcess);
+                            
+                                //Compute it's finsihed time, turnaround time, wait time and response time.
+				currentProcess.setFinishedTime(currentProcess.getArrivalTime(), quanta+1);
                                 //System.out.println("PID "+currentProcess.getId()+" finished time is "+currentProcess.getFinishedTime());
 				currentProcess.setTurnAroundTime(currentProcess.getFinishedTime(), currentProcess.getArrivalTime());
 				currentProcess.setWaitingTime(currentProcess.getTurnAroundTime(), currentProcess.getExpectedRunTime());
 				currentProcess.setResponseTime(currentProcess.getWaitingTime());
                         }
+                        
+                        //Increments quanta by 1.
                         quanta++;
 		}
-		printStatistics(processQueueTrack);
+                printStatistics(processQueueTrack);
+               
+                
 	}
 	
 	/**
@@ -77,22 +97,30 @@ public class ShortestRemainingTime {
 			turnAroundTimeTotal += p.getTurnAroundTime();
 			waitingTimeTotal += p.getWaitingTime();
 			responseTimeTotal += p.getResponseTime();
-			count++;
-			
-			if (count == 10){
-				timeChart += "\n";
-				count = 0;
-			}
 		
 			outputListing.add(p.toString());
 		}
 		// gathers up all the statistics
-		float averageTurnAroundTime = turnAroundTimeTotal/ processQueue.size();
-		float averageWaitingTime = waitingTimeTotal/ processQueue.size();
-		float averageResponseTime = responseTimeTotal/ processQueue.size();
+		float averageTurnAroundTime = turnAroundTimeTotal/ processQueueTrack.size();
+		float averageWaitingTime = waitingTimeTotal/ processQueueTrack.size();
+		float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
 		// casts throughtput to avoid truncating
 		float throughput = (float) processQueueTrack.size()/ 100;
-		String timeChartDisplay = "\n" + "Time Chart:" + timeChart;
+                        
+                String track = new String();
+                int quantumCount = 0;
+                for (ProcessSimulator p : processTimeTrack){
+                    
+                   
+                    track += "Q("+quantumCount+")="+p.id() + ", ";
+                    
+                    quantumCount++;
+                    
+                    if (quantumCount%10 == 0) {
+        				track += "\n";
+        			}
+                }
+                String timeChartDisplay = "\nTime Chart per quantum (Q): \n \n"+track+"\n";
 		outputListing.add(timeChartDisplay);
 		timeChartDisplay = "Average Turnaround Time: " + averageTurnAroundTime + "\tAverage Waiting Time: "
 				+ averageWaitingTime + "\tAverage Response Time: " + averageResponseTime + "\tThroughput: "

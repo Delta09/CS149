@@ -11,6 +11,7 @@ public class FirstComeFirstServed {
 	protected ArrayList<ProcessSimulator> processQueueTrack;
 	private ArrayList<String> outputListing;
 	private int quanta;
+	private ArrayList<ProcessSimulator> processTimeTrack;
 	
 	/**
 	 * Constructs objects for First-come first-served class.
@@ -20,6 +21,7 @@ public class FirstComeFirstServed {
 		this.processQueue = processQueue;
 		this.processQueueTrack = new ArrayList<>();
 		this.outputListing = new ArrayList<>();
+        this.processTimeTrack = new ArrayList<>();
 		this.quanta = 0;
 	}
 	
@@ -47,9 +49,11 @@ public class FirstComeFirstServed {
 			int i = 0;
 			while (i != runTime){
 				i++;
+				processTimeTrack.add(currentProcess);
 				if (i == runTime){
 					currentProcess.setProcessCompleted(false);
 					processQueueTrack.add(currentProcess);
+					
 				}
 			}
 			runTime = 0;
@@ -101,14 +105,27 @@ public class FirstComeFirstServed {
 			outputListing.add(p.toString());
 		}
 		// gathers up all the statistics
-		float averageTurnAroundTime = turnAroundTimeTotal/ processQueue.size();
-		float averageWaitingTime = waitingTimeTotal/ processQueue.size();
-		float averageResponseTime = responseTimeTotal/ processQueue.size();
+		float averageTurnAroundTime = turnAroundTimeTotal/ processQueueTrack.size();
+		float averageWaitingTime = waitingTimeTotal/ processQueueTrack.size();
+		float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
 		
 		// casts throughtput to avoid truncating
-		float throughput = (float) processQueueTrack.size()/ 100;
-		String timeChartDisplay = "\n" + "Time Chart:" + timeChart;
-		outputListing.add(timeChartDisplay);
+		float throughput = (float) processQueueTrack.size()/ 50;
+        
+        String track = new String();
+        int quantumCount = 0;
+        for (ProcessSimulator p : processTimeTrack){
+
+            track += "Q("+quantumCount+")="+p.id() + ", ";
+            quantumCount++;
+            
+            if (quantumCount%10 == 0) {
+				track += "\n";
+				}
+            
+        }
+        String timeChartDisplay = "\nTime Chart per quantum (Q): \n \n"+track+"\n";
+	outputListing.add(timeChartDisplay);
 		timeChartDisplay = "Average Turnaround Time: " + averageTurnAroundTime + "\tAverage Waiting Time: "
 				+ averageWaitingTime + "\tAverage Response Time: " + averageResponseTime + "\tThroughput: "
 				+ throughput + "\n";

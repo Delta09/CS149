@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 public class RoundRobin {
 	protected PriorityQueue<ProcessSimulator> processQueue;
 	protected ArrayList<ProcessSimulator> processQueueTrack;
+	protected ArrayList<String> TimeTrack;
 	private ArrayList<String> outputListing;
 	private LinkedList<ProcessSimulator> waiting;
 	private int quanta;
@@ -19,6 +20,7 @@ public class RoundRobin {
 	public RoundRobin(PriorityQueue<ProcessSimulator> processQueue) {
 		this.processQueue = processQueue;
 		this.processQueueTrack = new ArrayList<>();
+		this.TimeTrack = new ArrayList<>();
 		this.outputListing = new ArrayList<>();
 		this.quanta = 0;
 	}
@@ -29,46 +31,36 @@ public class RoundRobin {
 	public void runRR(){
 		ProcessSimulator currentProcess, incomingProcess;
 		waiting = new LinkedList<ProcessSimulator>();
-		int cp = 0;
 		
 		// runs when all processes are not all finished and is less than 100 quantum.
-		while (quanta < 100){ 
+		while (quanta < 100){
 			
 			if (processQueue.size() > 0 && processQueue.peek().getArrivalTime() == quanta ) {
+				
 				while(processQueue.size() > 0 && processQueue.peek().getArrivalTime() == quanta) {
 					
 					incomingProcess = processQueue.poll();					//incoming process = new guy
-					float t = incomingProcess.getRemainingRunTime();
-					incomingProcess.setRemainingRunTime(t-1);
 					
+					waiting.add(incomingProcess);
 					
-					quanta++;
-					
-					
-					if (incomingProcess.getRemainingRunTime() > 0) {
-						waiting.add(incomingProcess);
 					}
-					else {
-						incomingProcess.setFinishedTime(incomingProcess.getArrivalTime(), quanta);
-						incomingProcess.setTurnAroundTime(incomingProcess.getFinishedTime(), incomingProcess.getArrivalTime());
-						incomingProcess.setWaitingTime(incomingProcess.getTurnAroundTime(), incomingProcess.getExpectedRunTime());
-						incomingProcess.setResponseTime(incomingProcess.getWaitingTime());
-						
-						processQueueTrack.add(incomingProcess);
-					}
-					
-				}
 				
+				
+		
 			}
 			
-			else if (waiting.isEmpty()) {
-				quanta++;
-			}
 			
-			else {
+			if (!waiting.isEmpty()) {
 				currentProcess = waiting.pollFirst();
+				
+				
+				
+				TimeTrack.add(currentProcess.getId());
+				
 				currentProcess.setRemainingRunTime(currentProcess.getRemainingRunTime()-1);
 				quanta++;
+				
+				
 				
 				if (currentProcess.getRemainingRunTime() > 0) {
 					waiting.add(currentProcess);
@@ -82,8 +74,21 @@ public class RoundRobin {
 					
 					processQueueTrack.add(currentProcess);
 				}
+				
+				
+		
 			}
-		}
+			
+			else {
+				quanta++;
+				TimeTrack.add("Idle");
+				
+			}
+			
+			}
+			
+			
+		
 
 		printStatistics(processQueueTrack);
 	}
@@ -97,7 +102,7 @@ public class RoundRobin {
 		float turnAroundTimeTotal = 0;
 		float waitingTimeTotal = 0;
 		float responseTimeTotal = 0;
-		String timeChart = "";
+		String stats = "";
 		int count = 0;
 		
 		for (ProcessSimulator p : processQueueTrack){
@@ -107,7 +112,7 @@ public class RoundRobin {
 			count++;
 			
 			if (count == 10){
-				timeChart += "\n";
+				stats += "\n";
 				count = 0;
 			}
 		
@@ -119,14 +124,28 @@ public class RoundRobin {
 		float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
 		
 		// casts throughtput to avoid truncating
-		float throughput = (float) processQueueTrack.size()/ 100;
-		String timeChartDisplay = "\n" + "Time Chart:" + timeChart;
+		float throughput = (float) processQueueTrack.size()/ 50;
+		
+		String track = new String();
+		System.out.println("Time Chart:" );
+		int quanta=0;
+		for (String p : TimeTrack){
+			track += ("Q(" + quanta +")="+p + ", ");
+			quanta++;
+			if (quanta%10 == 0) {
+				track += "\n";
+			}
+			
+			}
+		String timeChartDisplay = "\nTime Chart per quantum (Q): \n \n"+track+"\n";
 		outputListing.add(timeChartDisplay);
-		timeChartDisplay = "Average Turnaround Time: " + averageTurnAroundTime + "\tAverage Waiting Time: "
+		
+		stats = "Average Turnaround Time: " + averageTurnAroundTime + "\tAverage Waiting Time: "
 				+ averageWaitingTime + "\tAverage Response Time: " + averageResponseTime + "\tThroughput: "
 				+ throughput + "\n";
-		outputListing.add(timeChartDisplay);
+		outputListing.add(stats);
 	}
+
 	
 	/**
 	 * Gets the output listing.
