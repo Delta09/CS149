@@ -4,7 +4,6 @@ import java.util.*;
  * Models a ShortestJobFirst class to serve processes in shortest run time first.
  * @author sandeepsamra
  * @author Pulkit Agrawal
- * @author yen_my_huynh
  */
 public class ShortestJobFirst
 {
@@ -110,9 +109,9 @@ public class ShortestJobFirst
 			outputListing.add(p.toString());
 		}
 		// gathers up all the statistics
-		float averageTurnAroundTime = turnAroundTimeTotal/ processQueue.size();
-		float averageWaitingTime = waitingTimeTotal/ processQueue.size();
-		float averageResponseTime = responseTimeTotal/ processQueue.size();
+		float averageTurnAroundTime = turnAroundTimeTotal/ processQueueTrack.size();
+		float averageWaitingTime = waitingTimeTotal/ processQueueTrack.size();
+		float averageResponseTime = responseTimeTotal/ processQueueTrack.size();
 		// casts throughtput to avoid truncating
 		float throughput = (float) processQueueTrack.size()/ 100;
 		String timeChartDisplay = "\n" + "Time Chart:" + timeChart;
