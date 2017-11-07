@@ -19,6 +19,11 @@ public class RoundRobin {
 	private int quantumSlice;
 
 
+	/**
+	 * Constructor for the Round Robin scheduler
+	 * @param processQueue queue of processeses to be execcuted
+	 * @param quantumSlice the time slice you would  like to 
+	 */
 	public RoundRobin(PriorityQueue<ProcessSimulator> processQueue, int quantumSlice) {
 		this.processQueue = processQueue;
 		this.processQueueTrack = new ArrayList<>();
@@ -38,6 +43,7 @@ public class RoundRobin {
 		ProcessSimulator currentProcess, incomingProcess;
 		ProcessSimulator idleProcess = new ProcessSimulator("Idle", 0.0f, 0.0f, 0, false); 
 		waiting = new LinkedList<ProcessSimulator>();
+		
 		// runs when all processes are not all finished and is less than 100 quantum.
 		while (quanta < 100){
 			if (processQueue.size() > 0 && processQueue.peek().getArrivalTime() <= quanta ) {
@@ -49,58 +55,56 @@ public class RoundRobin {
 				}
 				
 				if (!toAdd.isEmpty()) {				
-					waiting.addAll(0, toAdd);
-					toAdd.clear();
+					waiting.addAll(0, toAdd); 	//add to the front of the waiting queue
+					toAdd.clear();				// clear the LL so that new values can be added 
 				}
 			}
 
+			// if the waiting is not empty, time to process everything in the queue
 			if (!waiting.isEmpty()) {
 				currentProcess = waiting.pollFirst();
 				
 				currentProcess.setVisitedQuanta(quanta);
 				
+				//check to see if the process has been visited before. This is to collect the response time statistic
 				if (!currentProcess.isVisited()) {
 					currentProcess.setFirstQuanta(quanta);
 					currentProcess.setVisited(true);
 				}
 				
-				TimeTrack.add(currentProcess);
+				TimeTrack.add(currentProcess);  //add to time track to print time chart
 
-				currentProcess.setRemainingRunTime(currentProcess.getRemainingRunTime()-quantumSlice);
-				quanta+= quantumSlice;
+				currentProcess.setRemainingRunTime(currentProcess.getRemainingRunTime()-quantumSlice); // reduce the remaining time by 1
+				quanta+= quantumSlice; 
 				
 				
 
 				if (currentProcess.getRemainingRunTime() > 0) {
-					waiting.add(currentProcess);
+					waiting.add(currentProcess); //if incomplete then add back to waiting queu
 				}
 
 				else{
-					//quanta += currentProcess.getRemainingRunTime();
-					currentProcess.setFinishedTime(0, quanta);
+					//quanta += currentProcess.getRemainingRunTime();     if the process does not block till the end of the slice, readjust
+					currentProcess.setFinishedTime(0, quanta);				
 					currentProcess.setTurnAroundTime(currentProcess.getFinishedTime(), currentProcess.getArrivalTime());
 					currentProcess.setWaitingTime(currentProcess.getTurnAroundTime(), currentProcess.getExpectedRunTime());
 					currentProcess.setResponseTime( currentProcess.getFirstQuanta());
-					processQueueTrack.add(currentProcess);
+					processQueueTrack.add(currentProcess);				//add it to the completed process queue
 					
 				}
-
-
-
-
 			}
 
 			else {
 				
-				idleProcess.setVisitedQuanta(quanta);
-				TimeTrack.add(idleProcess);
-				quanta+= 1;
+				idleProcess.setVisitedQuanta(quanta);	//set this quanta to idle
+				TimeTrack.add(idleProcess);					
+				quanta+= 1;								
 			}
 
 		}
 
 
-		printStatistics(processQueueTrack);
+		printStatistics(processQueueTrack); //print out the statistics 
 	}
 
 	/**

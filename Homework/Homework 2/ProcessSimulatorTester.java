@@ -19,10 +19,10 @@ public class ProcessSimulatorTester {
 
 	// main method
 	public static void main(String args[]) {
-		PriorityQueue<ProcessSimulator> processQueue1 = new PriorityQueue<ProcessSimulator>(200, new ArrivalTimeComparator());
+		PriorityQueue<ProcessSimulator> processQueue1 = new PriorityQueue<ProcessSimulator>(100, new ArrivalTimeComparator());
 		ArrayList<ProcessSimulator> processQueue2 = new ArrayList<ProcessSimulator>();
-		PriorityQueue<ProcessSimulator> processQueue3 = new PriorityQueue<ProcessSimulator>(200, new RemainingRunTimeComparator());
-		PriorityQueue<ProcessSimulator> processQueue4 = new PriorityQueue<ProcessSimulator>(200, new ArrivalTimeComparator());
+		PriorityQueue<ProcessSimulator> processQueue3 = new PriorityQueue<ProcessSimulator>(100, new RemainingRunTimeComparator());
+		PriorityQueue<ProcessSimulator> processQueue4 = new PriorityQueue<ProcessSimulator>(100, new ArrivalTimeComparator());
 		ArrayDeque<ProcessSimulator> processQueue5 = new ArrayDeque<ProcessSimulator>();
 		ArrayDeque<ProcessSimulator> processQueue6 = new ArrayDeque<ProcessSimulator>();
 		Random rand = new Random();
@@ -33,7 +33,7 @@ public class ProcessSimulatorTester {
 
 			System.out.println("*********************************************Generated Queue********************************************");
 			// Generator for priority queues with different processes inside.
-			for (int k = 0; k < 200; k++) {
+			for (int k = 0; k < 100; k++) {
 				ProcessSimulator p = new ProcessSimulator(Integer.toString(k), randBetween(0, MAX_QUANTA),randBetween(0.1, 10), rand.nextInt(MAX_PRIORITY) + 1, processCompleted);
 				
 				processQueue1.add(p);
@@ -82,7 +82,6 @@ public class ProcessSimulatorTester {
 					"*************************************************Round Robin***********************************************");
 			RoundRobin RR = new RoundRobin(processQueue4, 1);
 			RR.runRR();
-
 			for (int j = 0; j < RR.getOutputListing().size(); j++) {
 				System.out.println(RR.getOutputListing().get(j));
 			}
