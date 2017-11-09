@@ -23,9 +23,7 @@ public class LRU extends Pager
                 //Takes memoryPage in memory[x]
                 memoryPage temp = memory.get(x);
                 //Checks if memoryPage is not empty
-                System.out.println(temp.name);
                 if (temp.name != '.'){
-                	System.out.println("Last Accessed is "+temp.lastAccessed);
                     //If lastAccessed in memoryPage[x] is greater than highest, set highest to lastAccessed. 
                     if(temp.lastAccessed > highest){
                         highest = temp.lastAccessed;

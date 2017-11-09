@@ -16,10 +16,8 @@ public class LFU extends Pager
                 //Takes memoryPage in memory[x]
                 memoryPage temp = memory.get(x);
                 //Checks if memoryPage is not empty
-                System.out.println(temp.name);
                 if (temp.name != '.'){
                     //If frequency in memoryPage[x] is lower than lowest, set lowest to frequency. 
-                    System.out.println(temp.frequency);
                 	if(temp.frequency < lowest){
                         lowest = temp.frequency;
                         //Index to remove is x

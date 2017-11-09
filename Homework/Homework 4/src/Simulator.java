@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.io.*;
 import java.util.LinkedList;
 
 /**
@@ -34,19 +35,29 @@ public class Simulator
 	 */
 	public static void main(String[] args) throws CloneNotSupportedException
 	{
+		PrintStream o = null;
+		try {
+			o = new PrintStream(new File("output.txt"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.setOut(o);
+		
 		int sim=1;
 		while(sim <= SIM_RUNS) {
+
 			generateMemory(100);
 			System.out.println("Simulation Run: " + sim);
 			System.out.println("------------------------------------------------");
 			LinkedList<Process> q = ProcessFactory.generateProcesses(PROCESS_COUNT);
 
-			System.out.println("Name    Arrival    Duration    Size");
-			for (Process p : q)
-				System.out.format("  %-8c %-10d %-8d %-8d\n", p.name, p.arrival, p.duration, p.size);
-
+			System.out.println("Name\t Arrival\t Duration\t Size");
+			for (Process p : q) {
+				System.out.format("%c\t %d\t\t %d\t\t %d", p.name, p.arrival, p.duration, p.size);
+				System.out.println();
+			}
 			System.out.println("------------------------------------------------");
-
 			ArrayList<Pager> pager = new ArrayList<Pager>() {{
 				add(new FIFO(memory, q)); 
 				add(new LFU(memory, q)); 
@@ -58,6 +69,7 @@ public class Simulator
 
 			for (Pager p : pager){
 				System.out.println("Paging: " + p.getName());
+				
 				p.simulate();
 				if (p.getName() == "FIFO"){
 					FIFO += p.swapped;
@@ -75,22 +87,31 @@ public class Simulator
 					RP += p.swapped;
 				}
 				System.out.println("------------------------------------------------");
-				System.out.println("------------------------------------------------");
+				
 				System.out.println();
+				
 			}
-			
+
 
 			System.out.println("\n\n");
+			
 			sim++;
 			memory.clear();
 		}
-		
+
 		System.out.println("FIFO: " +  FIFO/SIM_RUNS);
+		
 		System.out.println("LFU: " +  LFU/SIM_RUNS);
+		
 		System.out.println("LRU: " +  LRU/SIM_RUNS);
+		
 		System.out.println("MFU: " +  MFU/SIM_RUNS);
+		
 		System.out.println("Random Pick: " +  RP/SIM_RUNS);
+		
+		
 	}
+
 
 	public static void generateMemory(int n)
 	{	

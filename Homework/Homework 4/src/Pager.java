@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
@@ -44,7 +47,7 @@ public abstract class Pager
 		int free = memory.size();
 		double time = 0.0;
 		boolean firstTime = true;
-		while (time < 60) {
+		while (time <= 60) {
 
 			if(!firstTime) {
 				update();
@@ -73,13 +76,14 @@ public abstract class Pager
 						}
 						addProcess(p, frame);
 						free--;
-						System.out.println(time + ", " + p.name + ",  Enter,  " + p.size + ", " + p.duration);
+						System.out.println("Time:" + time + ",\t Name:" + p.name + ",\t Enter,\t\t Size:" + p.size + ",\tService Duration:" + p.duration);
+						printMemoryMap();
 					}
 
 					
 				} 
-				else if(free > 0){//add existing Procdxx
-					if (checkProcess(p, frame)) { //hit
+				else if(free > 0){
+					if (checkProcess(p, frame)) {
 						memory.indexOf(p.name);
 						update2(p, frame);
 					}
@@ -90,17 +94,18 @@ public abstract class Pager
 						}
 						addProcess(p, frame);
 						free--;
+						System.out.println("Time:" + time + ",\t Name:" + p.name + ",\t Enter,\t\t Size:" + p.size + ",\t Service Duration:" + p.duration);
+						printMemoryMap();
 					}
 
 					
 				}
 				else if( free == 0 ){
 					int index = run();
-					System.out.println(time + ", " + p.name + ",  Enter,  " + frame + ", " + index + ", " + p.name +", "+ frame);
-					System.out.println(index);
-					System.out.println(getName());
 					replace(index, p, frame);
 					swapped++;
+					System.out.println("Time:" + time + ",\t Name:" + p.name + ",\t Exit,\t\t Size:" + p.size + ",\t Service Duration:" + p.duration);
+					printMemoryMap();
 				}
 				
 			}
@@ -109,11 +114,6 @@ public abstract class Pager
 			bd=bd.round(new MathContext(3));
 			
 			time = bd.doubleValue();
-			if ((time == Math.floor(time)) && !Double.isInfinite(time)) {
-				System.out.println("Time:"+ time);
-				printMemoryMap();
-			}
-
 		}
 	}
 
@@ -152,7 +152,6 @@ private boolean checkProcess(Process p, int frame) {
 }
 
 private void replace(int index, Process p, int page) {
-	// TODO Auto-generated method stub
 	memory.set(index, new memoryPage(p, page, 0, 0, 0));
 }
 
