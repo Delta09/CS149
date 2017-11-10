@@ -10,7 +10,7 @@ public class LFU extends Pager
 	public int run(){
             //Index in main memory to remove memoryPage. -1 means an error has occured.
             int remove = -1;
-            double lowest = memory.getFirst().frequency;
+            double lowest = Integer.MAX_VALUE;
             //Loops through all entry in main memory
             for (int x = 0; x < memory.size(); x++){
                 //Takes memoryPage in memory[x]

@@ -15,7 +15,7 @@ public class Process implements Cloneable
     public double start;
     public int arrival;
     public char name;
-    public HashSet<Integer> pagesinMemory;
+    public boolean inMemory;
     
     public Process(int duration, int size, char name, int arrival, double start)
     {
@@ -25,7 +25,7 @@ public class Process implements Cloneable
         this.arrival = arrival;
         this.start = start;
         this.current = 0;
-        pagesinMemory = new HashSet<Integer>();
+        inMemory = false;
     }
         
     @Override 
@@ -65,10 +65,6 @@ public class Process implements Cloneable
 			return j;
 		}
 	}
-    
-    public boolean addPage(int page) {
-    	return (pagesinMemory.add(page));
-    }
     
     public boolean equals(Object other) {
     	if(this.name == ((Process) other).name)

@@ -13,22 +13,18 @@ import java.util.LinkedList;
  *     -Processes have randomly, evenly distributed sizes of  4, 8, 16, and 32 MB
  *     -Processes last 1, 2, 3, 4, or 5 seconds    
  *     -Process Scheduler uses FCFS
- *     -Simulation runs for "60 seconds" (sped up 10x)
+ *     -Simulation runs for "60 seconds"
  * 
- * Each algorithm is ran 5 times to get an average of the number of processes 
- * successfully swapped into memory (but not necessarily completed) and each time
- * a swap occurs the memory map is printed like 
- * AAAA....BBBBBBBB..CCCC with one letter / dot per MB of memory
  */
 
 public class Simulator 
 {
-	public static final int SIM_RUNS = 1;
+	public static final int SIM_RUNS = 5;
 	public static final int SIM_TIME_MAX = 60; 
 	public static final int MEMORY_SIZE = 100; 
 	public static final int PROCESS_COUNT= 160;
 	public static LinkedList<memoryPage> memory = new LinkedList<memoryPage>();
-	public static double FIFO, LFU, LRU, MFU, RP;
+	public static double FIFOsw, FIFOhm, LFUsw, LFUhm, LRUsw, LRUhm, MFUsw, MFUhm, RPsw, RPhm;
 
 	/** Simulate each algorithm SIM_RUNS times. Print out memory maps 
 	 * each time memory is changed, and also print overall statistics 
@@ -72,19 +68,24 @@ public class Simulator
 				
 				p.simulate();
 				if (p.getName() == "FIFO"){
-					FIFO += p.swapped;
+					FIFOsw += p.swapped;
+					FIFOhm += p.ratio;
 				}
 				if (p.getName() == "LFU"){
-					LFU += p.swapped;
+					LFUsw += p.swapped;
+					LFUhm += p.ratio;
 				}
 				if (p.getName() == "LRU"){
-					LRU += p.swapped;
+					LRUsw += p.swapped;
+					LRUhm += p.ratio;
 				}
 				if (p.getName() == "MFU"){
-					MFU += p.swapped;
+					MFUsw += p.swapped;
+					MFUhm += p.ratio;
 				}
 				if (p.getName() == "Random Pick"){
-					RP += p.swapped;
+					RPsw += p.swapped;
+					RPhm += p.ratio;
 				}
 				System.out.println("------------------------------------------------");
 				
@@ -98,16 +99,21 @@ public class Simulator
 			sim++;
 			memory.clear();
 		}
-
-		System.out.println("FIFO: " +  FIFO/SIM_RUNS);
-		
-		System.out.println("LFU: " +  LFU/SIM_RUNS);
-		
-		System.out.println("LRU: " +  LRU/SIM_RUNS);
-		
-		System.out.println("MFU: " +  MFU/SIM_RUNS);
-		
-		System.out.println("Random Pick: " +  RP/SIM_RUNS);
+		System.out.println("Average Number of Processes Successfully Switched in over " + SIM_RUNS + " runs:");
+		System.out.println("---------------------------------------------------------------------------------");
+		System.out.println("FIFO: " +  FIFOsw/SIM_RUNS);
+		System.out.println("LFU: " +  LFUsw/SIM_RUNS);
+		System.out.println("LRU: " +  LRUsw/SIM_RUNS);
+		System.out.println("MFU: " +  MFUsw/SIM_RUNS);
+		System.out.println("Random Pick: " +  RPsw/SIM_RUNS);
+		System.out.println();
+		System.out.println("Average Hit/Miss Ration over " + SIM_RUNS + " runs:");
+		System.out.println("---------------------------------------------------------------------------------");
+		System.out.println("FIFO: " +  FIFOhm/SIM_RUNS);
+		System.out.println("LFU: " +  LFUhm/SIM_RUNS);
+		System.out.println("LRU: " +  LRUhm/SIM_RUNS);
+		System.out.println("MFU: " +  MFUhm/SIM_RUNS);
+		System.out.println("Random Pick: " +  RPhm/SIM_RUNS);
 		
 		
 	}

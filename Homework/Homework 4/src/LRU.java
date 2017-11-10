@@ -1,11 +1,6 @@
 import java.util.LinkedList;
 
-/**
- * @author  
- * 
- * Simulate memory swapping with the First Fit algorithm
- * Swaps process memory into the first available chunk in the memory map
- */
+
 public class LRU extends Pager
 {
     

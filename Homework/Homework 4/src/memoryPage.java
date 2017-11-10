@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
- *
- * @author Bala Nyan Kyaw
+ * @author 
+ * 
+ * An object representing a Memory Page, containing process pages
  */
 public class memoryPage {
            

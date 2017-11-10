@@ -6,12 +6,7 @@ import java.util.Random;
 
 /**
  * @author 
- * 
- * A ProcessFactory that generates processes such that there are one or more processes
- * that are unable to finish in SIM_TIME_MAX
- * 
- * Processes last int[1,5] seconds
- * Processes use [4, 8, 16, 32] MB of memory and are EVENLY and RANDOMLY distributed
+ * A ProcessFactory that generates processes
  */
 public class ProcessFactory 
 {    
@@ -45,7 +40,7 @@ public class ProcessFactory
 				d.add(j);
 			}
 		}
-		Collections.shuffle(d, new Random(10));
+		Collections.shuffle(d, new Random());
 		
 		
 		for (int i = 0; i < 40; i++) {
@@ -53,7 +48,7 @@ public class ProcessFactory
 				s.add(PROCESS_SIZES_MB[j]);
 			}
 		}
-		Collections.shuffle(s, new Random(10));
+		Collections.shuffle(s, new Random());
 		
 		
 		while (processQueue.size() < NAMES.length())

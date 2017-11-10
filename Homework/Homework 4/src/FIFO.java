@@ -1,11 +1,6 @@
 import java.util.LinkedList;
 
-/**
- * @author  
- * 
- * Simulate memory swapping with the Best Fit algorithm
- * Search the entire memory space for the smallest available chunk to allocate
- */
+
 public class FIFO extends Pager
 {
 	
